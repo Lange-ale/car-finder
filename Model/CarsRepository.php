@@ -19,22 +19,47 @@ class CarsRepository{
         return CarsRepository::listAllDistinct(['colore']);
     }
 
-    public static function listAllBrands(): array
-    {
+    public static function listAllBrands(): array{
         return CarsRepository::listAllDistinct(['marca']);
     }
 
-    public static function listAllModels(): array
-    {
+    public static function listAllModels(): array{
         return CarsRepository::listAllDistinct(['modello']);
     }
 
-    public static function listModels($brand): array
-    {
+    public static function listModels($brand): array{
         $pdo = Connection::getInstance();
         $sql = 'SELECT DISTINCT modello FROM veicolo where marca = :brand';
         $stmt = $pdo->prepare($sql);
         $stmt->execute(['brand' => $brand]);
+        return $stmt->fetchAll();
+    }
+
+    public static function searchCars($plates_parts, $color, $brand, $model): array{
+        $pdo = Connection::getInstance();
+        $sql = 'SELECT * FROM veicolo WHERE ';
+        $params = [];
+        $i = 0;
+        foreach ($plates_parts as $part){
+            $sql = $sql . 'targa LIKE :part'.$i.' AND ';
+            $params['part'.$i] = '%'.$part.'%';
+            $i++;
+        }
+        if ($color != ''){
+            $sql = $sql . 'colore = :color AND ';
+            $params['color'] = $color;
+        }
+        if ($brand != ''){
+            $sql = $sql . 'marca = :brand AND ';
+            $params['brand'] = $brand;
+        }
+        if ($model != ''){
+            $sql = $sql . 'modello = :model AND ';
+            $params['model'] = $model;
+        }
+        $sql = substr($sql, 0, -4);
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
         return $stmt->fetchAll();
     }
 }

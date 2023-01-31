@@ -4,51 +4,37 @@ require_once 'vendor/autoload.php';
 require_once 'conf/config.php';
 
 use League\Plates\Engine;
-use Model\TodoRepository;
+use Model\CarsRepository;
 
 $template = new Engine('templates','tpl');
 
-//Gestisce l'aggiunta di un nuovo impegno
-if (isset($_POST['impegno'])){
-    $impegno = $_POST['impegno'];
-    $importanza = $_POST['importanza'];
-    if (isset($_POST['id'])){
-        $id = $_POST['id'];
-        TodoRepository::updateTesto($impegno, $importanza, $id);
-    }
-    else if ($impegno != '') {
-        TodoRepository::add($impegno, $importanza);
-    }
+$parts_of_plates = [];
+$i = 0;
+while (isset($_POST['part'.$i])){
+    if (!isset($_POST['delete_part'.$i]))
+        $parts_of_plates['part'.$i] = $_POST['part'.$i];
+    $i++;
+}
+if (isset($_POST['add_part']))
+    $parts_of_plates['part'.$i] = '';
+else if (isset($_POST['search'])){
+
 }
 
-$testo = "";
-$importanza = -1;
-$id = null;
+$cars = CarsRepository::listAllCars();
+$colors = CarsRepository::listAllColors();
+$brands = isset($_POST['brand']) ? [0=>[0=> $_POST['brand']]] : CarsRepository::listAllBrands();
+$add_model = isset($_POST['add_model']);
+$models = [];
+if ($add_model)
+    $models = CarsRepository::listModels($_POST['brand']);
 
-if (isset($_GET['action'])){
-    $azione = $_GET['action'];
-    $id = $_GET['id'];
-    //Gestisce il completamento di un impegno
-    if ($azione == 'completa'){
-        TodoRepository::completa($id);
-    }
-    //Gestisce il recupero del testo dell'impegno da modificare
-    else if ($azione == 'modifica'){
-        $impegno = TodoRepository::getImpegno($id);
-        $testo = $impegno['testo'];
-        $importanza = $impegno['importanza'];
-    }
-    //Gestisce l'eliminazione
-    else if ($azione == 'elimina'){
-        TodoRepository::delete($id);
-    }
-}
-
-$todos = TodoRepository::listAll();
-
-echo $template->render('crud', [
-    'todos' => $todos,
-    'testo' => $testo,
-    'importanza' => $importanza,
-    'id' => $id
+echo $template->render('index', [
+    'cars' => $cars,
+    'post' => $_POST,
+    'parts_of_plates' => $parts_of_plates,
+    'colors' => $colors,
+    'brands' => $brands,
+    'add_model' => $add_model,
+    'models' => $models
 ]);

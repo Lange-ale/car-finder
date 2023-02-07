@@ -28,7 +28,6 @@ else if (isset($_POST['search'])){
     $cars = CarsRepository::searchCars($parts_of_plates, $color, $brand, $model);
 }
 
-$cars = CarsRepository::listAllCars();
 $colors = CarsRepository::listAllColors();
 $brands = isset($_POST['brand']) ? [0=>[0=> $_POST['brand']]] : CarsRepository::listAllBrands();
 $add_model = isset($_POST['add_model']);

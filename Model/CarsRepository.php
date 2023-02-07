@@ -4,7 +4,7 @@ namespace Model;
 use Util\Connection;
 
 class CarsRepository{
-    private static function listAllDistinct(array $name_columns): array{
+    public static function listAllDistinct(array $name_columns): array{
         $pdo = Connection::getInstance();
         $sql = 'SELECT DISTINCT ' . implode('', $name_columns) . ' FROM veicolo';
         $stmt = $pdo->query($sql);
@@ -35,9 +35,10 @@ class CarsRepository{
         return $stmt->fetchAll();
     }
 
-    public static function searchCars($plates_parts, $color, $brand, $model): array{
+    public static function search($distinct, $columns, $plates_parts, $color, $brand, $model): array{
         $pdo = Connection::getInstance();
-        $sql = 'SELECT * FROM veicolo WHERE ';
+        $sql = 'SELECT ' . ($distinct ? 'DISTINCT ' : '') .
+            implode(',', $columns) . ' FROM veicolo WHERE ';
         $params = [];
         $i = 0;
         foreach ($plates_parts as $part){
@@ -61,5 +62,12 @@ class CarsRepository{
         $stmt = $pdo->prepare($sql);
         $stmt->execute($params);
         return $stmt->fetchAll();
+    }
+
+    public static function searchCars($plates_parts, $color, $brand, $model): array{
+        $distinct = false;
+        return CarsRepository::search($distinct,
+            ['marca', 'modello', 'colore', 'targa', 'nome_proprietario', 'cognome_proprietario', 'codice_fiscale'],
+            $plates_parts, $color, $brand, $model);
     }
 }

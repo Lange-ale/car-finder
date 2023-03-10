@@ -29,9 +29,9 @@ class CarsRepository{
 
     public static function listModels($brand): array{
         $pdo = Connection::getInstance();
-        $sql = 'SELECT DISTINCT modello FROM veicolo where marca = :brand';
+        $sql = 'SELECT DISTINCT modello FROM veicolo where marca LIKE :brand';
         $stmt = $pdo->prepare($sql);
-        $stmt->execute(['brand' => $brand]);
+        $stmt->execute(['brand' => '%' . $brand . '%']);
         return $stmt->fetchAll();
     }
 

@@ -1,3 +1,5 @@
 /vendor
 composer.lock
 conf/config.php
+conf/config.production.php
+conf/config.local.php

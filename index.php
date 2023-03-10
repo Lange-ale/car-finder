@@ -28,12 +28,12 @@ else if (isset($_POST['search'])){
     $cars = CarsRepository::searchCars($parts_of_plates, $color, $brand, $model);
 }
 
-$colors = CarsRepository::listAllColors();
-$brands = isset($_POST['brand']) ? [0=>[0=> $_POST['brand']]] : CarsRepository::listAllBrands();
-$add_model = isset($_POST['add_model']);
+$colors = $color != '' ? [0=>[0=> $color]] : CarsRepository::listAllColors();
+$brands = $brand != '' ? [0=>[0=> $brand]] : CarsRepository::listAllBrands();
+$add_model = isset($_POST['add_model']) || $model != '';
 $models = [];
 if ($add_model)
-    $models = CarsRepository::listModels($_POST['brand']);
+    $models = $model != '' ? [0=>[0=> $model]] : CarsRepository::listModels($brand);
 
 $cars = $cars != [] ? $cars : CarsRepository::searchCars($parts_of_plates, $color, $brand, $model);
 
